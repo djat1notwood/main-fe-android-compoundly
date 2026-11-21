@@ -44,6 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.djatslabs.compoundly.R
+import com.djatslabs.compoundly.ui.components.CompoundlyBrandHeader
 import com.djatslabs.compoundly.ui.theme.CompoundlyTheme
 import kotlinx.coroutines.launch
 
@@ -96,21 +97,10 @@ fun OnboardingScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(10.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.app_name),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                }
+                CompoundlyBrandHeader(
+                    textStyle = MaterialTheme.typography.titleMedium,
+                    markSize = 26.dp
+                )
 
                 if (!isLastPage) {
                     TextButton(
