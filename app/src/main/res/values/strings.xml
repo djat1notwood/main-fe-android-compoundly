@@ -1,3 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Compundly</string>
+    <string name="app_name">Compoundly</string>
+
+    <!-- Top App Bar -->
+    <string name="cd_reset_tab">Kosongkan input pada tab aktif</string>
+    <string name="cd_currency_selector">Pilih mata uang</string>
+
+    <!-- Bottom Navigation -->
+    <string name="tab_compound_interest">Bunga Majemuk</string>
+    <string name="tab_savings_goal">Target Tabungan</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_skip">Lewati</string>
+    <string name="onboarding_next">Lanjut</string>
+    <string name="onboarding_get_started">Mulai Hitung</string>
+    <string name="onboarding_slide_1_title">Proyeksi Bunga Majemuk</string>
+    <string name="onboarding_slide_1_body">Simulasikan pertumbuhan investasi secara real-time dengan setoran bulanan, pilihan frekuensi bunga, dan rincian saldo tiap tahun.</string>
+    <string name="onboarding_slide_2_title">Rencanakan Target Tabungan</string>
+    <string name="onboarding_slide_2_body">Tetapkan target nominal dan tenggat waktu untuk langsung mengetahui berapa yang perlu ditabung setiap bulan.</string>
+    <string name="onboarding_slide_3_title">100% Offline &amp; Privat</string>
+    <string name="onboarding_slide_3_body">Seluruh perhitungan berjalan langsung di perangkat Anda. Tanpa akun, tanpa internet, dan tanpa izin akses sensitif.</string>
+
+    <!-- Common Financial Labels -->
+    <string name="percent_symbol">%</string>
+    <string name="view_quick_guide">Lihat panduan singkat</string>
+    <string name="hint_amount_idr">10.000.000</string>
+    <string name="hint_amount_usd_eur">1,000</string>
+    <string name="hint_monthly_idr">500.000</string>
+    <string name="hint_monthly_usd_eur">200</string>
+    <string name="hint_rate">8</string>
+    <string name="hint_years">10</string>
+    <string name="hint_timeframe_months">36</string>
+    <string name="hint_timeframe_years">3</string>
+
+    <!-- Tab 1: Compound Interest Calculator -->
+    <string name="compound_hero_title">Total Nilai Akhir</string>
+    <string name="compound_hero_badge_years">Proyeksi %1$d Tahun</string>
+    <string name="compound_hero_badge_empty">Siap Dihitung</string>
+    <string name="compound_metric_principal">Total Modal Disetor</string>
+    <string name="compound_metric_interest">Total Bunga Didapat</string>
+    <string name="compound_legend_principal_pct">Modal (%1$d%%)</string>
+    <string name="compound_legend_interest_pct">Bunga (%1$d%%)</string>
+    <string name="compound_legend_principal">Modal</string>
+    <string name="compound_legend_interest">Bunga</string>
+    <string name="compound_section_inputs">Parameter Investasi</string>
+    <string name="compound_input_initial">Modal Awal</string>
+    <string name="compound_input_monthly">Setoran Bulanan</string>
+    <string name="compound_input_rate">Estimasi Bunga Tahunan</string>
+    <string name="compound_input_years">Jangka Waktu (Tahun)</string>
+    <string name="compound_slider_years_value">%1$d thn</string>
+    <string name="compound_slider_min">0 thn</string>
+    <string name="compound_slider_max">50 thn</string>
+    <string name="compound_input_frequency">Frekuensi Bunga</string>
+    <string name="frequency_monthly">Bulanan</string>
+    <string name="frequency_annually">Tahunan</string>
+    <string name="compound_info_caption">Setoran bulanan dihitung di akhir bulan. Pada frekuensi Tahunan, bunga dikompound setiap akhir tahun untuk estimasi perencanaan.</string>
+    <string name="compound_breakdown_title">Rincian Proyeksi Tahunan</string>
+    <string name="compound_breakdown_subtitle">%1$d tahun diproyeksikan</string>
+    <string name="compound_breakdown_empty">Masukkan nominal dan jangka waktu untuk melihat rincian pertumbuhan per tahun.</string>
+    <string name="compound_breakdown_year_label">Tahun %1$d</string>
+    <string name="compound_breakdown_principal_short">Modal: %1$s</string>
+    <string name="compound_breakdown_interest_short">Bunga: %1$s</string>
+    <string name="cd_expand_breakdown">Tampilkan rincian tahunan</string>
+    <string name="cd_collapse_breakdown">Sembunyikan rincian tahunan</string>
+
+    <!-- Tab 2: Savings Goal Calculator -->
+    <string name="savings_hero_title">Wajib Ditabung per Bulan</string>
+    <string name="savings_per_month_suffix">/ bulan</string>
+    <string name="savings_badge_awaiting">Siap Dihitung</string>
+    <string name="savings_badge_months">Target %1$d Bulan</string>
+    <string name="savings_badge_reached">Target Tercapai</string>
+    <string name="savings_badge_invalid_time">Isi Tenggat</string>
+    <string name="savings_note_awaiting">Masukkan target tabungan dan tenggat waktu untuk melihat rencana bulanan Anda.</string>
+    <string name="savings_note_reached">Tabungan saat ini beserta proyeksi imbal hasilnya sudah mencukupi target Anda.</string>
+    <string name="savings_note_invalid_time">Tentukan tenggat waktu minimal 1 bulan agar nominal bulanan dapat dihitung.</string>
+    <string name="savings_metric_deposits">Total Setoran Sendiri</string>
+    <string name="savings_metric_interest">Kontribusi Bunga</string>
+    <string name="savings_legend_deposits_pct">Setoran (%1$d%%)</string>
+    <string name="savings_legend_interest_pct">Bunga (%1$d%%)</string>
+    <string name="savings_legend_deposits">Setoran</string>
+    <string name="savings_legend_interest">Bunga</string>
+    <string name="savings_section_inputs">Detail Target Tabungan</string>
+    <string name="savings_input_target">Target Nominal Tabungan</string>
+    <string name="savings_input_current">Tabungan Saat Ini</string>
+    <string name="savings_input_rate">Estimasi Bunga Tahunan</string>
+    <string name="savings_input_timeframe">Tenggat Waktu</string>
+    <string name="timeframe_months">Bulan</string>
+    <string name="timeframe_years">Tahun</string>
+    <string name="savings_info_caption">Estimasi mengasumsikan imbal hasil tahunan tetap dengan setoran di akhir bulan, hanya untuk tujuan perencanaan edukatif.</string>
 </resources>

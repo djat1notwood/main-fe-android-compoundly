@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Compundly"
+rootProject.name = "Compoundly"
 include(":app")
