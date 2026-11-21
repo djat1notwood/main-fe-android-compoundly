@@ -83,7 +83,9 @@ fun CompoundInterestScreen(
     )
 
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .testTag("compound_list"),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
@@ -186,11 +188,15 @@ fun CompoundInterestScreen(
                                 activeTrackColor = MaterialTheme.colorScheme.primary,
                                 inactiveTrackColor = CompoundlyTheme.financialColors.emptyBarTrack
                             ),
-                            modifier = Modifier.testTag("slider_years")
+                            modifier = Modifier
+                                .padding(top = 2.dp)
+                                .testTag("slider_years")
                         )
 
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 2.dp),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
@@ -199,7 +205,11 @@ fun CompoundInterestScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = stringResource(R.string.compound_slider_years_value, yearsCount),
+                                text = if (yearsCount > 0) {
+                                    stringResource(R.string.compound_slider_years_value, yearsCount)
+                                } else {
+                                    ""
+                                },
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.primary
@@ -377,7 +387,9 @@ private fun YearlyBreakdownRowCard(
     val endingFormatted = CurrencyFormatter.formatCurrency(item.endingBalance, currency)
 
     Surface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("breakdown_row_${item.year}"),
         shape = RoundedCornerShape(14.dp),
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(1.dp, CompoundlyTheme.financialColors.cardBorder)

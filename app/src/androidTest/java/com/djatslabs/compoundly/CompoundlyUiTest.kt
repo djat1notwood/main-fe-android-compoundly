@@ -7,6 +7,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToKey
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -51,19 +52,25 @@ class CompoundlyUiTest {
     fun compoundInterest_realTimeCalculation_currencyToggle_breakdownAndReset() {
         composeRule.onNodeWithTag("onboarding_skip").performClick()
 
+        composeRule.onNodeWithTag("compound_list").performScrollToKey("compound_inputs")
         composeRule.onNodeWithTag("input_initial").performScrollTo().performTextInput("10000000")
         composeRule.onNodeWithTag("input_rate").performScrollTo().performTextInput("8")
         composeRule.onNodeWithTag("input_years").performScrollTo().performTextInput("1")
 
+        composeRule.onNodeWithTag("compound_list").performScrollToKey("compound_hero")
         composeRule.onNodeWithTag("compound_hero_value").assertTextContains("10.829.995", substring = true)
 
         composeRule.onNodeWithTag("currency_USD").performClick()
         composeRule.onNodeWithTag("compound_hero_value").assertTextContains("$", substring = true)
 
         composeRule.onNodeWithTag("currency_IDR").performClick()
-        composeRule.onNodeWithTag("breakdown_toggle").performScrollTo().performClick()
+        composeRule.onNodeWithTag("compound_list").performScrollToKey("compound_breakdown_header")
+        composeRule.onNodeWithTag("breakdown_toggle").performClick()
+        composeRule.onNodeWithTag("compound_list").performScrollToKey(1)
+        composeRule.onNodeWithTag("breakdown_row_1").assertIsDisplayed()
 
         composeRule.onNodeWithTag("reset_button").performClick()
+        composeRule.onNodeWithTag("compound_list").performScrollToKey("compound_hero")
         composeRule.onNodeWithTag("compound_hero_value").assertTextContains("0", substring = true)
     }
 
@@ -71,19 +78,23 @@ class CompoundlyUiTest {
     fun savingsGoalTab_calculatesAndResetsWithoutClearingCompoundTab() {
         composeRule.onNodeWithTag("onboarding_skip").performClick()
 
+        composeRule.onNodeWithTag("compound_list").performScrollToKey("compound_inputs")
         composeRule.onNodeWithTag("input_initial").performScrollTo().performTextInput("5000000")
         composeRule.onNodeWithTag("nav_savings").performClick()
 
+        composeRule.onNodeWithTag("savings_list").performScrollToKey("savings_inputs")
         composeRule.onNodeWithTag("input_target").performScrollTo().performTextInput("12000000")
         composeRule.onNodeWithTag("input_timeframe").performScrollTo().performTextInput("12")
         composeRule.onNodeWithTag("unit_months").performScrollTo().performClick()
 
+        composeRule.onNodeWithTag("savings_list").performScrollToKey("savings_hero")
         composeRule.onNodeWithTag("savings_hero_value").assertTextContains("1.000.000", substring = true)
 
         composeRule.onNodeWithTag("reset_button").performClick()
         composeRule.onNodeWithTag("savings_hero_value").assertTextContains("0", substring = true)
 
         composeRule.onNodeWithTag("nav_compound").performClick()
+        composeRule.onNodeWithTag("compound_list").performScrollToKey("compound_hero")
         composeRule.onNodeWithTag("compound_hero_value").assertTextContains("5.000.000", substring = true)
     }
 }
