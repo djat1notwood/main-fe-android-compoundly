@@ -9,6 +9,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToKey
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Rule
@@ -96,5 +97,32 @@ class CompoundlyUiTest {
         composeRule.onNodeWithTag("nav_compound").performClick()
         composeRule.onNodeWithTag("compound_list").performScrollToKey("compound_hero")
         composeRule.onNodeWithTag("compound_hero_value").assertTextContains("5.000.000", substring = true)
+    }
+
+    @Test
+    fun monthlyInterestRateOption_recalculatesOnBothTabs() {
+        composeRule.onNodeWithTag("onboarding_skip").performClick()
+
+        composeRule.onNodeWithTag("compound_list").performScrollToKey("compound_inputs")
+        composeRule.onNodeWithTag("input_initial").performScrollTo().performTextInput("10000000")
+        composeRule.onNodeWithTag("input_rate").performScrollTo().performTextInput("1")
+        composeRule.onNodeWithTag("compound_rate_monthly").performScrollTo().performClick()
+        composeRule.onNodeWithTag("input_years").performScrollTo().performTextInput("1")
+
+        // 1% per month for 12 months on 10,000,000 -> 11,268,250
+        composeRule.onNodeWithTag("compound_list").performScrollToKey("compound_hero")
+        composeRule.onNodeWithTag("compound_hero_value").assertTextContains("11.268.250", substring = true)
+
+        composeRule.onNodeWithTag("nav_savings").performClick()
+        composeRule.onNodeWithTag("savings_list").performScrollToKey("savings_inputs")
+        composeRule.onNodeWithTag("input_target").performScrollTo().performTextInput("12682503")
+        composeRule.onNodeWithTag("input_savings_rate").performScrollTo().performTextReplacement("1")
+        composeRule.onNodeWithTag("savings_rate_monthly").performScrollTo().performClick()
+        composeRule.onNodeWithTag("input_timeframe").performScrollTo().performTextInput("12")
+        composeRule.onNodeWithTag("unit_months").performScrollTo().performClick()
+
+        // 1% monthly return over 12 months yields < 1,000,000 required per month (< 12,682,503 / 12)
+        composeRule.onNodeWithTag("savings_list").performScrollToKey("savings_hero")
+        composeRule.onNodeWithTag("savings_hero_value").assertTextContains("1.000.000", substring = true)
     }
 }

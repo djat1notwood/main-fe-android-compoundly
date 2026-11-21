@@ -3,7 +3,8 @@ package com.djatslabs.compoundly.domain.model
 data class CompoundInterestInput(
     val initialInvestment: Double = 0.0,
     val monthlyContribution: Double = 0.0,
-    val annualRatePercent: Double = 0.0,
+    val interestRatePercent: Double = 0.0,
+    val ratePeriod: InterestRatePeriod = InterestRatePeriod.ANNUALLY,
     val years: Int = 0,
     val frequency: CompoundingFrequency = CompoundingFrequency.MONTHLY
 )

@@ -23,12 +23,18 @@
 
     <!-- Common Financial Labels -->
     <string name="percent_symbol">%</string>
+    <string name="rate_suffix_yearly">%/yr</string>
+    <string name="rate_suffix_monthly">%/mo</string>
+    <string name="rate_period_yearly">Yearly</string>
+    <string name="rate_period_monthly">Monthly</string>
+    <string name="rate_equivalent_yearly">Equivalent to %1$s%% per year</string>
     <string name="view_quick_guide">View quick guide</string>
     <string name="hint_amount_idr">10.000.000</string>
     <string name="hint_amount_usd_eur">1,000</string>
     <string name="hint_monthly_idr">500.000</string>
     <string name="hint_monthly_usd_eur">200</string>
     <string name="hint_rate">8</string>
+    <string name="hint_rate_monthly">1</string>
     <string name="hint_years">10</string>
     <string name="hint_timeframe_months">36</string>
     <string name="hint_timeframe_years">3</string>
@@ -46,7 +52,7 @@
     <string name="compound_section_inputs">Investment Parameters</string>
     <string name="compound_input_initial">Initial Investment</string>
     <string name="compound_input_monthly">Monthly Contribution</string>
-    <string name="compound_input_rate">Annual Interest Rate</string>
+    <string name="compound_input_rate">Interest Rate</string>
     <string name="compound_input_years">Time Period (Years)</string>
     <string name="compound_slider_years_value">%1$d yrs</string>
     <string name="compound_slider_min">0 yrs</string>
@@ -83,9 +89,9 @@
     <string name="savings_section_inputs">Savings Goal Details</string>
     <string name="savings_input_target">Target Amount</string>
     <string name="savings_input_current">Current Savings</string>
-    <string name="savings_input_rate">Annual Return Rate</string>
+    <string name="savings_input_rate">Expected Return Rate</string>
     <string name="savings_input_timeframe">Timeframe</string>
     <string name="timeframe_months">Months</string>
     <string name="timeframe_years">Years</string>
-    <string name="savings_info_caption">Estimates assume a constant annual return with end-of-month deposits, for educational planning only.</string>
+    <string name="savings_info_caption">Estimates assume a constant return rate with end-of-month deposits, for educational planning only.</string>
 </resources>

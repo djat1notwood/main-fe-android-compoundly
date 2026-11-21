@@ -3,6 +3,7 @@ package com.djatslabs.compoundly.ui.state
 import com.djatslabs.compoundly.data.OnboardingPreferences
 import com.djatslabs.compoundly.domain.model.AppCurrency
 import com.djatslabs.compoundly.domain.model.CompoundingFrequency
+import com.djatslabs.compoundly.domain.model.InterestRatePeriod
 import com.djatslabs.compoundly.domain.model.SavingsGoalStatus
 import com.djatslabs.compoundly.domain.model.TimeframeUnit
 import org.junit.Assert.assertEquals
@@ -35,11 +36,13 @@ class CompoundlyViewModelTest {
         assertEquals(CalculatorTab.COMPOUND_INTEREST, state.selectedTab)
         assertEquals("", state.compoundState.initialInvestmentInput)
         assertEquals("", state.compoundState.monthlyContributionInput)
-        assertEquals("", state.compoundState.annualRateInput)
+        assertEquals("", state.compoundState.interestRateInput)
+        assertEquals(InterestRatePeriod.ANNUALLY, state.compoundState.ratePeriod)
         assertEquals("", state.compoundState.yearsInput)
         assertEquals("", state.savingsState.targetAmountInput)
         assertEquals("", state.savingsState.currentSavingsInput)
-        assertEquals("0", state.savingsState.annualReturnInput)
+        assertEquals("0", state.savingsState.returnRateInput)
+        assertEquals(InterestRatePeriod.ANNUALLY, state.savingsState.ratePeriod)
         assertEquals("", state.savingsState.timeframeInput)
     }
 
@@ -62,7 +65,7 @@ class CompoundlyViewModelTest {
 
         viewModel.onInitialInvestmentChanged("10000000")
         viewModel.onMonthlyContributionChanged("500000")
-        viewModel.onCompoundAnnualRateChanged("8")
+        viewModel.onCompoundInterestRateChanged("8")
         viewModel.onCompoundYearsSliderChanged(10f)
 
         val state = viewModel.uiState.value.compoundState
@@ -77,6 +80,33 @@ class CompoundlyViewModelTest {
 
         viewModel.onCompoundingFrequencyChanged(CompoundingFrequency.ANNUALLY)
         assertEquals(CompoundingFrequency.ANNUALLY, viewModel.uiState.value.compoundState.frequency)
+    }
+
+    @Test
+    fun monthlyInterestPeriod_recalculatesInRealTimeOnBothTabs() {
+        val viewModel = CompoundlyViewModel(FakeOnboardingPreferences(true))
+
+        viewModel.onInitialInvestmentChanged("10000000")
+        viewModel.onCompoundInterestRateChanged("1")
+        viewModel.onCompoundYearsChanged("1")
+        val yearlyRateBalance = viewModel.uiState.value.compoundState.result.finalBalance
+
+        viewModel.onCompoundRatePeriodChanged(InterestRatePeriod.MONTHLY)
+        val monthlyRateBalance = viewModel.uiState.value.compoundState.result.finalBalance
+        assertEquals(InterestRatePeriod.MONTHLY, viewModel.uiState.value.compoundState.ratePeriod)
+        assertTrue(monthlyRateBalance > yearlyRateBalance)
+
+        viewModel.onTabSelected(CalculatorTab.SAVINGS_GOAL)
+        viewModel.onTargetAmountChanged("12000000")
+        viewModel.onSavingsReturnRateChanged("1")
+        viewModel.onSavingsTimeframeChanged("12")
+        viewModel.onTimeframeUnitChanged(TimeframeUnit.MONTHS)
+        val annualReturnMonthlySaving = viewModel.uiState.value.savingsState.result.requiredMonthlySavings
+
+        viewModel.onSavingsRatePeriodChanged(InterestRatePeriod.MONTHLY)
+        val monthlyReturnMonthlySaving = viewModel.uiState.value.savingsState.result.requiredMonthlySavings
+        assertEquals(InterestRatePeriod.MONTHLY, viewModel.uiState.value.savingsState.ratePeriod)
+        assertTrue(monthlyReturnMonthlySaving < annualReturnMonthlySaving)
     }
 
     @Test
@@ -100,29 +130,34 @@ class CompoundlyViewModelTest {
 
         // Populate Tab 1
         viewModel.onInitialInvestmentChanged("1000000")
+        viewModel.onCompoundRatePeriodChanged(InterestRatePeriod.MONTHLY)
         viewModel.onCompoundYearsChanged("5")
 
         // Populate Tab 2
         viewModel.onTabSelected(CalculatorTab.SAVINGS_GOAL)
         viewModel.onTargetAmountChanged("12000000")
-        viewModel.onSavingsAnnualReturnChanged("6")
+        viewModel.onSavingsReturnRateChanged("1")
+        viewModel.onSavingsRatePeriodChanged(InterestRatePeriod.MONTHLY)
         viewModel.onSavingsTimeframeChanged("12")
         viewModel.onTimeframeUnitChanged(TimeframeUnit.MONTHS)
 
         assertEquals(SavingsGoalStatus.VALID, viewModel.uiState.value.savingsState.result.status)
 
-        // Reset Tab 2 -> Tab 1 must stay untouched; Tab 2 rate resets to "0"
+        // Reset Tab 2 -> Tab 1 must stay untouched; Tab 2 rate resets to "0" and ANNUALLY
         viewModel.onResetActiveTab()
         assertEquals("", viewModel.uiState.value.savingsState.targetAmountInput)
-        assertEquals("0", viewModel.uiState.value.savingsState.annualReturnInput)
+        assertEquals("0", viewModel.uiState.value.savingsState.returnRateInput)
+        assertEquals(InterestRatePeriod.ANNUALLY, viewModel.uiState.value.savingsState.ratePeriod)
         assertEquals("", viewModel.uiState.value.savingsState.timeframeInput)
         assertEquals("1000000", viewModel.uiState.value.compoundState.initialInvestmentInput)
+        assertEquals(InterestRatePeriod.MONTHLY, viewModel.uiState.value.compoundState.ratePeriod)
         assertEquals("5", viewModel.uiState.value.compoundState.yearsInput)
 
         // Reset Tab 1
         viewModel.onTabSelected(CalculatorTab.COMPOUND_INTEREST)
         viewModel.onResetActiveTab()
         assertEquals("", viewModel.uiState.value.compoundState.initialInvestmentInput)
+        assertEquals(InterestRatePeriod.ANNUALLY, viewModel.uiState.value.compoundState.ratePeriod)
         assertEquals("", viewModel.uiState.value.compoundState.yearsInput)
         assertEquals(0.0, viewModel.uiState.value.compoundState.result.finalBalance, 1e-9)
     }

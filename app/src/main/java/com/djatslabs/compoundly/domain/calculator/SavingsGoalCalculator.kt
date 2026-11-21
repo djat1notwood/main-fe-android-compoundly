@@ -11,9 +11,9 @@ class SavingsGoalCalculator {
     fun calculate(input: SavingsGoalInput): SavingsGoalResult {
         val target = FinancialMathUtils.sanitizeNonNegative(input.targetAmount)
         val current = FinancialMathUtils.sanitizeNonNegative(input.currentSavings)
-        val annualReturnPercent = FinancialMathUtils.sanitizeNonNegative(
-            value = input.annualReturnPercent,
-            maxValue = FinancialMathUtils.MAX_ANNUAL_RATE_PERCENT
+        val rates = FinancialMathUtils.resolveRates(
+            ratePercent = input.returnRatePercent,
+            period = input.ratePeriod
         )
         val totalMonths = when (input.timeframeUnit) {
             TimeframeUnit.MONTHS -> input.timeframeValue.coerceIn(0, FinancialMathUtils.MAX_MONTHS)
@@ -36,7 +36,7 @@ class SavingsGoalCalculator {
             )
         }
 
-        val monthlyRate = (annualReturnPercent / 100.0) / MONTHS_PER_YEAR
+        val monthlyRate = rates.monthlyRate
         val growthFactor = (1.0 + monthlyRate).pow(totalMonths)
         val futureValueCurrent = if (growthFactor.isFinite()) {
             FinancialMathUtils.sanitizeNonNegative(current * growthFactor, Double.MAX_VALUE)

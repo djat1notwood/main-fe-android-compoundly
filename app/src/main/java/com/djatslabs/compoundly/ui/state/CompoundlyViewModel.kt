@@ -11,6 +11,7 @@ import com.djatslabs.compoundly.domain.model.AppCurrency
 import com.djatslabs.compoundly.domain.model.CompoundInterestInput
 import com.djatslabs.compoundly.domain.model.CompoundInterestResult
 import com.djatslabs.compoundly.domain.model.CompoundingFrequency
+import com.djatslabs.compoundly.domain.model.InterestRatePeriod
 import com.djatslabs.compoundly.domain.model.SavingsGoalInput
 import com.djatslabs.compoundly.domain.model.SavingsGoalResult
 import com.djatslabs.compoundly.domain.model.TimeframeUnit
@@ -28,7 +29,8 @@ enum class CalculatorTab {
 data class CompoundInterestUiState(
     val initialInvestmentInput: String = "",
     val monthlyContributionInput: String = "",
-    val annualRateInput: String = "",
+    val interestRateInput: String = "",
+    val ratePeriod: InterestRatePeriod = InterestRatePeriod.ANNUALLY,
     val yearsInput: String = "",
     val yearsSliderValue: Float = 0f,
     val frequency: CompoundingFrequency = CompoundingFrequency.MONTHLY,
@@ -39,7 +41,8 @@ data class CompoundInterestUiState(
 data class SavingsGoalUiState(
     val targetAmountInput: String = "",
     val currentSavingsInput: String = "",
-    val annualReturnInput: String = DEFAULT_SAVINGS_RETURN_RATE,
+    val returnRateInput: String = DEFAULT_SAVINGS_RETURN_RATE,
+    val ratePeriod: InterestRatePeriod = InterestRatePeriod.ANNUALLY,
     val timeframeInput: String = "",
     val timeframeUnit: TimeframeUnit = TimeframeUnit.YEARS,
     val result: SavingsGoalResult = SavingsGoalResult()
@@ -148,10 +151,18 @@ class CompoundlyViewModel(
         }
     }
 
-    fun onCompoundAnnualRateChanged(raw: String) {
+    fun onCompoundInterestRateChanged(raw: String) {
         _uiState.update { current ->
             val sanitized = CurrencyFormatter.sanitizeRateInput(raw)
-            val updated = current.compoundState.copy(annualRateInput = sanitized)
+            val updated = current.compoundState.copy(interestRateInput = sanitized)
+            current.copy(compoundState = recalculateCompound(updated))
+        }
+    }
+
+    fun onCompoundRatePeriodChanged(period: InterestRatePeriod) {
+        _uiState.update { current ->
+            if (current.compoundState.ratePeriod == period) return@update current
+            val updated = current.compoundState.copy(ratePeriod = period)
             current.copy(compoundState = recalculateCompound(updated))
         }
     }
@@ -215,10 +226,18 @@ class CompoundlyViewModel(
         }
     }
 
-    fun onSavingsAnnualReturnChanged(raw: String) {
+    fun onSavingsReturnRateChanged(raw: String) {
         _uiState.update { current ->
             val sanitized = CurrencyFormatter.sanitizeRateInput(raw)
-            val updated = current.savingsState.copy(annualReturnInput = sanitized)
+            val updated = current.savingsState.copy(returnRateInput = sanitized)
+            current.copy(savingsState = recalculateSavings(updated))
+        }
+    }
+
+    fun onSavingsRatePeriodChanged(period: InterestRatePeriod) {
+        _uiState.update { current ->
+            if (current.savingsState.ratePeriod == period) return@update current
+            val updated = current.savingsState.copy(ratePeriod = period)
             current.copy(savingsState = recalculateSavings(updated))
         }
     }
@@ -266,7 +285,8 @@ class CompoundlyViewModel(
             CompoundInterestInput(
                 initialInvestment = CurrencyFormatter.parseDouble(state.initialInvestmentInput),
                 monthlyContribution = CurrencyFormatter.parseDouble(state.monthlyContributionInput),
-                annualRatePercent = CurrencyFormatter.parseDouble(state.annualRateInput),
+                interestRatePercent = CurrencyFormatter.parseDouble(state.interestRateInput),
+                ratePeriod = state.ratePeriod,
                 years = CurrencyFormatter.parseInt(state.yearsInput),
                 frequency = state.frequency
             )
@@ -279,7 +299,8 @@ class CompoundlyViewModel(
             SavingsGoalInput(
                 targetAmount = CurrencyFormatter.parseDouble(state.targetAmountInput),
                 currentSavings = CurrencyFormatter.parseDouble(state.currentSavingsInput),
-                annualReturnPercent = CurrencyFormatter.parseDouble(state.annualReturnInput),
+                returnRatePercent = CurrencyFormatter.parseDouble(state.returnRateInput),
+                ratePeriod = state.ratePeriod,
                 timeframeValue = CurrencyFormatter.parseInt(state.timeframeInput),
                 timeframeUnit = state.timeframeUnit
             )

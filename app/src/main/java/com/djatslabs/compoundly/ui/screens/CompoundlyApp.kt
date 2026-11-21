@@ -15,6 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.djatslabs.compoundly.domain.model.AppCurrency
+import com.djatslabs.compoundly.domain.model.CompoundingFrequency
+import com.djatslabs.compoundly.domain.model.InterestRatePeriod
+import com.djatslabs.compoundly.domain.model.TimeframeUnit
 import com.djatslabs.compoundly.ui.components.CompoundlyBottomBar
 import com.djatslabs.compoundly.ui.components.CompoundlyTopBar
 import com.djatslabs.compoundly.ui.state.CalculatorTab
@@ -37,14 +41,16 @@ fun CompoundlyApp(
         onResetActiveTab = viewModel::onResetActiveTab,
         onInitialInvestmentChanged = viewModel::onInitialInvestmentChanged,
         onMonthlyContributionChanged = viewModel::onMonthlyContributionChanged,
-        onCompoundAnnualRateChanged = viewModel::onCompoundAnnualRateChanged,
+        onCompoundInterestRateChanged = viewModel::onCompoundInterestRateChanged,
+        onCompoundRatePeriodChanged = viewModel::onCompoundRatePeriodChanged,
         onCompoundYearsChanged = viewModel::onCompoundYearsChanged,
         onCompoundYearsSliderChanged = viewModel::onCompoundYearsSliderChanged,
         onCompoundingFrequencyChanged = viewModel::onCompoundingFrequencyChanged,
         onToggleBreakdownExpanded = viewModel::onToggleBreakdownExpanded,
         onTargetAmountChanged = viewModel::onTargetAmountChanged,
         onCurrentSavingsChanged = viewModel::onCurrentSavingsChanged,
-        onSavingsAnnualReturnChanged = viewModel::onSavingsAnnualReturnChanged,
+        onSavingsReturnRateChanged = viewModel::onSavingsReturnRateChanged,
+        onSavingsRatePeriodChanged = viewModel::onSavingsRatePeriodChanged,
         onSavingsTimeframeChanged = viewModel::onSavingsTimeframeChanged,
         onTimeframeUnitChanged = viewModel::onTimeframeUnitChanged,
         modifier = modifier
@@ -57,20 +63,22 @@ fun CompoundlyAppContent(
     onCompleteOnboarding: () -> Unit,
     onReopenOnboarding: () -> Unit,
     onTabSelected: (CalculatorTab) -> Unit,
-    onCurrencySelected: (com.djatslabs.compoundly.domain.model.AppCurrency) -> Unit,
+    onCurrencySelected: (AppCurrency) -> Unit,
     onResetActiveTab: () -> Unit,
     onInitialInvestmentChanged: (String) -> Unit,
     onMonthlyContributionChanged: (String) -> Unit,
-    onCompoundAnnualRateChanged: (String) -> Unit,
+    onCompoundInterestRateChanged: (String) -> Unit,
+    onCompoundRatePeriodChanged: (InterestRatePeriod) -> Unit,
     onCompoundYearsChanged: (String) -> Unit,
     onCompoundYearsSliderChanged: (Float) -> Unit,
-    onCompoundingFrequencyChanged: (com.djatslabs.compoundly.domain.model.CompoundingFrequency) -> Unit,
+    onCompoundingFrequencyChanged: (CompoundingFrequency) -> Unit,
     onToggleBreakdownExpanded: () -> Unit,
     onTargetAmountChanged: (String) -> Unit,
     onCurrentSavingsChanged: (String) -> Unit,
-    onSavingsAnnualReturnChanged: (String) -> Unit,
+    onSavingsReturnRateChanged: (String) -> Unit,
+    onSavingsRatePeriodChanged: (InterestRatePeriod) -> Unit,
     onSavingsTimeframeChanged: (String) -> Unit,
-    onTimeframeUnitChanged: (com.djatslabs.compoundly.domain.model.TimeframeUnit) -> Unit,
+    onTimeframeUnitChanged: (TimeframeUnit) -> Unit,
     modifier: Modifier = Modifier
 ) {
     AnimatedContent(
@@ -117,7 +125,8 @@ fun CompoundlyAppContent(
                                     state = uiState.compoundState,
                                     onInitialInvestmentChanged = onInitialInvestmentChanged,
                                     onMonthlyContributionChanged = onMonthlyContributionChanged,
-                                    onAnnualRateChanged = onCompoundAnnualRateChanged,
+                                    onInterestRateChanged = onCompoundInterestRateChanged,
+                                    onRatePeriodChanged = onCompoundRatePeriodChanged,
                                     onYearsChanged = onCompoundYearsChanged,
                                     onYearsSliderChanged = onCompoundYearsSliderChanged,
                                     onFrequencyChanged = onCompoundingFrequencyChanged,
@@ -131,7 +140,8 @@ fun CompoundlyAppContent(
                                     state = uiState.savingsState,
                                     onTargetAmountChanged = onTargetAmountChanged,
                                     onCurrentSavingsChanged = onCurrentSavingsChanged,
-                                    onAnnualReturnChanged = onSavingsAnnualReturnChanged,
+                                    onReturnRateChanged = onSavingsReturnRateChanged,
+                                    onRatePeriodChanged = onSavingsRatePeriodChanged,
                                     onTimeframeChanged = onSavingsTimeframeChanged,
                                     onTimeframeUnitChanged = onTimeframeUnitChanged,
                                     onViewGuideClick = onReopenOnboarding

@@ -3,7 +3,8 @@ package com.djatslabs.compoundly.domain.model
 data class SavingsGoalInput(
     val targetAmount: Double = 0.0,
     val currentSavings: Double = 0.0,
-    val annualReturnPercent: Double = 0.0,
+    val returnRatePercent: Double = 0.0,
+    val ratePeriod: InterestRatePeriod = InterestRatePeriod.ANNUALLY,
     val timeframeValue: Int = 0,
     val timeframeUnit: TimeframeUnit = TimeframeUnit.YEARS
 )

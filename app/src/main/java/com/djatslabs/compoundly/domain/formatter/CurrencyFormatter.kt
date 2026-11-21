@@ -24,6 +24,16 @@ object CurrencyFormatter {
         return formatter.format(safeAmount)
     }
 
+    fun formatPercent(percent: Double): String {
+        val safePercent = if (!percent.isFinite() || percent <= 0.0) 0.0 else percent
+        val formatter = NumberFormat.getNumberInstance(AppCurrency.USD.locale).apply {
+            isGroupingUsed = false
+            minimumFractionDigits = 0
+            maximumFractionDigits = 2
+        }
+        return formatter.format(safePercent)
+    }
+
     fun sanitizeCurrencyInput(raw: String, currency: AppCurrency): String {
         if (raw.isEmpty()) return ""
         val allowDecimal = currency.maxFractionDigits > 0

@@ -44,6 +44,14 @@ class CurrencyFormatterTest {
     }
 
     @Test
+    fun formatPercent_formatsCleanlyWithoutTrailingZeros() {
+        assertEquals("12", CurrencyFormatter.formatPercent(12.0))
+        assertEquals("7.5", CurrencyFormatter.formatPercent(7.5))
+        assertEquals("4.8", CurrencyFormatter.formatPercent(0.4 * 12.0))
+        assertEquals("0", CurrencyFormatter.formatPercent(Double.NaN))
+    }
+
+    @Test
     fun visualTransformation_maintainsValidMonotonicOffsetMapping() {
         val samples = listOf(
             "",

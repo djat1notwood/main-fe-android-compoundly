@@ -19,9 +19,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
@@ -41,11 +38,13 @@ import com.djatslabs.compoundly.R
 import com.djatslabs.compoundly.domain.formatter.CurrencyFormatter
 import com.djatslabs.compoundly.domain.model.AppCurrency
 import com.djatslabs.compoundly.domain.model.CompoundingFrequency
+import com.djatslabs.compoundly.domain.model.InterestRatePeriod
 import com.djatslabs.compoundly.domain.model.YearlyBreakdownItem
 import com.djatslabs.compoundly.ui.components.CompoundlyNumericOutlinedField
+import com.djatslabs.compoundly.ui.components.CompoundlySegmentedSelector
 import com.djatslabs.compoundly.ui.components.CurrencyInputField
 import com.djatslabs.compoundly.ui.components.HeroResultCard
-import com.djatslabs.compoundly.ui.components.PercentageInputField
+import com.djatslabs.compoundly.ui.components.RateInputWithPeriodToggle
 import com.djatslabs.compoundly.ui.components.StackedProportionBar
 import com.djatslabs.compoundly.ui.components.SubtleInfoCaption
 import com.djatslabs.compoundly.ui.state.CompoundInterestUiState
@@ -59,7 +58,8 @@ fun CompoundInterestScreen(
     state: CompoundInterestUiState,
     onInitialInvestmentChanged: (String) -> Unit,
     onMonthlyContributionChanged: (String) -> Unit,
-    onAnnualRateChanged: (String) -> Unit,
+    onInterestRateChanged: (String) -> Unit,
+    onRatePeriodChanged: (InterestRatePeriod) -> Unit,
     onYearsChanged: (String) -> Unit,
     onYearsSliderChanged: (Float) -> Unit,
     onFrequencyChanged: (CompoundingFrequency) -> Unit,
@@ -157,13 +157,18 @@ fun CompoundInterestScreen(
                         modifier = Modifier.testTag("input_monthly")
                     )
 
-                    PercentageInputField(
-                        value = state.annualRateInput,
-                        onValueChange = onAnnualRateChanged,
+                    RateInputWithPeriodToggle(
+                        value = state.interestRateInput,
+                        ratePeriod = state.ratePeriod,
+                        onValueChange = onInterestRateChanged,
+                        onRatePeriodChanged = onRatePeriodChanged,
                         label = stringResource(R.string.compound_input_rate),
-                        placeholder = stringResource(R.string.hint_rate),
-                        imeAction = ImeAction.Next,
-                        modifier = Modifier.testTag("input_rate")
+                        yearlyPlaceholder = stringResource(R.string.hint_rate),
+                        monthlyPlaceholder = stringResource(R.string.hint_rate_monthly),
+                        inputTestTag = "input_rate",
+                        yearlyToggleTestTag = "compound_rate_annually",
+                        monthlyToggleTestTag = "compound_rate_monthly",
+                        imeAction = ImeAction.Next
                     )
 
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -229,44 +234,24 @@ fun CompoundInterestScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
-                        SingleChoiceSegmentedButtonRow(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            val frequencies = CompoundingFrequency.entries
-                            frequencies.forEachIndexed { index, frequency ->
-                                val selected = state.frequency == frequency
-                                val label = when (frequency) {
+                        CompoundlySegmentedSelector(
+                            options = CompoundingFrequency.entries,
+                            selectedOption = state.frequency,
+                            onOptionSelected = onFrequencyChanged,
+                            labelProvider = { frequency ->
+                                when (frequency) {
                                     CompoundingFrequency.MONTHLY -> stringResource(R.string.frequency_monthly)
                                     CompoundingFrequency.ANNUALLY -> stringResource(R.string.frequency_annually)
                                 }
-                                SegmentedButton(
-                                    selected = selected,
-                                    onClick = { onFrequencyChanged(frequency) },
-                                    shape = SegmentedButtonDefaults.itemShape(
-                                        index = index,
-                                        count = frequencies.size
-                                    ),
-                                    colors = SegmentedButtonDefaults.colors(
-                                        activeContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                                        activeContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                        inactiveContainerColor = MaterialTheme.colorScheme.surface,
-                                        inactiveContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                    ),
-                                    modifier = Modifier.testTag(
-                                        if (frequency == CompoundingFrequency.MONTHLY) {
-                                            "freq_monthly"
-                                        } else {
-                                            "freq_annually"
-                                        }
-                                    )
-                                ) {
-                                    Text(
-                                        text = label,
-                                        fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium
-                                    )
+                            },
+                            testTagProvider = { frequency ->
+                                if (frequency == CompoundingFrequency.MONTHLY) {
+                                    "freq_monthly"
+                                } else {
+                                    "freq_annually"
                                 }
                             }
-                        }
+                        )
                     }
                 }
             }

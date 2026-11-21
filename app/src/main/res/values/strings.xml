@@ -23,12 +23,18 @@
 
     <!-- Common Financial Labels -->
     <string name="percent_symbol">%</string>
+    <string name="rate_suffix_yearly">%/thn</string>
+    <string name="rate_suffix_monthly">%/bln</string>
+    <string name="rate_period_yearly">Per Tahun</string>
+    <string name="rate_period_monthly">Per Bulan</string>
+    <string name="rate_equivalent_yearly">Setara %1$s%% per tahun</string>
     <string name="view_quick_guide">Lihat panduan singkat</string>
     <string name="hint_amount_idr">10.000.000</string>
     <string name="hint_amount_usd_eur">1,000</string>
     <string name="hint_monthly_idr">500.000</string>
     <string name="hint_monthly_usd_eur">200</string>
     <string name="hint_rate">8</string>
+    <string name="hint_rate_monthly">1</string>
     <string name="hint_years">10</string>
     <string name="hint_timeframe_months">36</string>
     <string name="hint_timeframe_years">3</string>
@@ -46,7 +52,7 @@
     <string name="compound_section_inputs">Parameter Investasi</string>
     <string name="compound_input_initial">Modal Awal</string>
     <string name="compound_input_monthly">Setoran Bulanan</string>
-    <string name="compound_input_rate">Estimasi Bunga Tahunan</string>
+    <string name="compound_input_rate">Estimasi Bunga</string>
     <string name="compound_input_years">Jangka Waktu (Tahun)</string>
     <string name="compound_slider_years_value">%1$d thn</string>
     <string name="compound_slider_min">0 thn</string>
@@ -83,9 +89,9 @@
     <string name="savings_section_inputs">Detail Target Tabungan</string>
     <string name="savings_input_target">Target Nominal Tabungan</string>
     <string name="savings_input_current">Tabungan Saat Ini</string>
-    <string name="savings_input_rate">Estimasi Bunga Tahunan</string>
+    <string name="savings_input_rate">Estimasi Imbal Hasil</string>
     <string name="savings_input_timeframe">Tenggat Waktu</string>
     <string name="timeframe_months">Bulan</string>
     <string name="timeframe_years">Tahun</string>
-    <string name="savings_info_caption">Estimasi mengasumsikan imbal hasil tahunan tetap dengan setoran di akhir bulan, hanya untuk tujuan perencanaan edukatif.</string>
+    <string name="savings_info_caption">Estimasi mengasumsikan tingkat imbal hasil tetap dengan setoran di akhir bulan, hanya untuk tujuan perencanaan edukatif.</string>
 </resources>

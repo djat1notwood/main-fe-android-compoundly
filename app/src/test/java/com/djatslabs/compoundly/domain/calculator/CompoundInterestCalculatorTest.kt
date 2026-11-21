@@ -2,6 +2,7 @@ package com.djatslabs.compoundly.domain.calculator
 
 import com.djatslabs.compoundly.domain.model.CompoundInterestInput
 import com.djatslabs.compoundly.domain.model.CompoundingFrequency
+import com.djatslabs.compoundly.domain.model.InterestRatePeriod
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -29,7 +30,7 @@ class CompoundInterestCalculatorTest {
             CompoundInterestInput(
                 initialInvestment = 5_000_000.0,
                 monthlyContribution = 500_000.0,
-                annualRatePercent = 10.0,
+                interestRatePercent = 10.0,
                 years = 0,
                 frequency = CompoundingFrequency.MONTHLY
             )
@@ -49,7 +50,7 @@ class CompoundInterestCalculatorTest {
             CompoundInterestInput(
                 initialInvestment = 1_000.0,
                 monthlyContribution = 100.0,
-                annualRatePercent = 0.0,
+                interestRatePercent = 0.0,
                 years = 3,
                 frequency = CompoundingFrequency.MONTHLY
             )
@@ -83,7 +84,7 @@ class CompoundInterestCalculatorTest {
             CompoundInterestInput(
                 initialInvestment = initial,
                 monthlyContribution = monthly,
-                annualRatePercent = 8.0,
+                interestRatePercent = 8.0,
                 years = years,
                 frequency = CompoundingFrequency.MONTHLY
             )
@@ -98,12 +99,40 @@ class CompoundInterestCalculatorTest {
     }
 
     @Test
+    fun monthlyInterestRatePeriod_matchesEquivalentNominalAnnualRate() {
+        val monthlyPeriodResult = calculator.calculate(
+            CompoundInterestInput(
+                initialInvestment = 10_000_000.0,
+                monthlyContribution = 500_000.0,
+                interestRatePercent = 1.0,
+                ratePeriod = InterestRatePeriod.MONTHLY,
+                years = 5,
+                frequency = CompoundingFrequency.MONTHLY
+            )
+        )
+        val annualPeriodResult = calculator.calculate(
+            CompoundInterestInput(
+                initialInvestment = 10_000_000.0,
+                monthlyContribution = 500_000.0,
+                interestRatePercent = 12.0,
+                ratePeriod = InterestRatePeriod.ANNUALLY,
+                years = 5,
+                frequency = CompoundingFrequency.MONTHLY
+            )
+        )
+
+        assertEquals(annualPeriodResult.finalBalance, monthlyPeriodResult.finalBalance, 1e-6)
+        assertEquals(annualPeriodResult.totalInterest, monthlyPeriodResult.totalInterest, 1e-6)
+        assertEquals(5, monthlyPeriodResult.yearlyBreakdown.size)
+    }
+
+    @Test
     fun monthlyCompounding_exceedsAnnualCompoundingAtSameNominalRate() {
         val monthlyResult = calculator.calculate(
             CompoundInterestInput(
                 initialInvestment = 10_000.0,
                 monthlyContribution = 100.0,
-                annualRatePercent = 10.0,
+                interestRatePercent = 10.0,
                 years = 10,
                 frequency = CompoundingFrequency.MONTHLY
             )
@@ -112,7 +141,7 @@ class CompoundInterestCalculatorTest {
             CompoundInterestInput(
                 initialInvestment = 10_000.0,
                 monthlyContribution = 100.0,
-                annualRatePercent = 10.0,
+                interestRatePercent = 10.0,
                 years = 10,
                 frequency = CompoundingFrequency.ANNUALLY
             )
@@ -129,7 +158,8 @@ class CompoundInterestCalculatorTest {
             CompoundInterestInput(
                 initialInvestment = Double.NaN,
                 monthlyContribution = Double.POSITIVE_INFINITY,
-                annualRatePercent = -50.0,
+                interestRatePercent = -50.0,
+                ratePeriod = InterestRatePeriod.MONTHLY,
                 years = -5,
                 frequency = CompoundingFrequency.MONTHLY
             )
@@ -142,7 +172,8 @@ class CompoundInterestCalculatorTest {
             CompoundInterestInput(
                 initialInvestment = 1e18,
                 monthlyContribution = 1e16,
-                annualRatePercent = 9999.0,
+                interestRatePercent = 9999.0,
+                ratePeriod = InterestRatePeriod.MONTHLY,
                 years = 500,
                 frequency = CompoundingFrequency.MONTHLY
             )

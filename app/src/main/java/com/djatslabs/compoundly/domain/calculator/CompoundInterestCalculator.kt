@@ -10,12 +10,12 @@ class CompoundInterestCalculator {
     fun calculate(input: CompoundInterestInput): CompoundInterestResult {
         val initial = FinancialMathUtils.sanitizeNonNegative(input.initialInvestment)
         val monthly = FinancialMathUtils.sanitizeNonNegative(input.monthlyContribution)
-        val annualRatePercent = FinancialMathUtils.sanitizeNonNegative(
-            value = input.annualRatePercent,
-            maxValue = FinancialMathUtils.MAX_ANNUAL_RATE_PERCENT
+        val rates = FinancialMathUtils.resolveRates(
+            ratePercent = input.interestRatePercent,
+            period = input.ratePeriod
         )
         val years = input.years.coerceIn(0, FinancialMathUtils.MAX_YEARS)
-        val annualRate = annualRatePercent / 100.0
+        val annualRate = rates.annualRate
 
         if (years == 0) {
             val (principalRatio, interestRatio) = FinancialMathUtils.computeSplitRatios(initial, initial)
@@ -38,7 +38,7 @@ class CompoundInterestCalculator {
         var cumulativePrincipal = initial
         var cumulativeInterest = 0.0
         val breakdown = ArrayList<YearlyBreakdownItem>(years)
-        val monthlyRate = annualRate / MONTHS_PER_YEAR
+        val monthlyRate = rates.monthlyRate
 
         for (year in 1..years) {
             var yearlyPrincipalAdded = 0.0

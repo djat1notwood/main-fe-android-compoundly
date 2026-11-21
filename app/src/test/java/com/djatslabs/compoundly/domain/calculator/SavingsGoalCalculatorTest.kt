@@ -2,6 +2,7 @@ package com.djatslabs.compoundly.domain.calculator
 
 import com.djatslabs.compoundly.domain.model.CompoundInterestInput
 import com.djatslabs.compoundly.domain.model.CompoundingFrequency
+import com.djatslabs.compoundly.domain.model.InterestRatePeriod
 import com.djatslabs.compoundly.domain.model.SavingsGoalInput
 import com.djatslabs.compoundly.domain.model.SavingsGoalStatus
 import com.djatslabs.compoundly.domain.model.TimeframeUnit
@@ -30,7 +31,7 @@ class SavingsGoalCalculatorTest {
             SavingsGoalInput(
                 targetAmount = 10_000_000.0,
                 currentSavings = 1_000_000.0,
-                annualReturnPercent = 0.0,
+                returnRatePercent = 0.0,
                 timeframeValue = 0,
                 timeframeUnit = TimeframeUnit.MONTHS
             )
@@ -46,7 +47,7 @@ class SavingsGoalCalculatorTest {
             SavingsGoalInput(
                 targetAmount = 24_000_000.0,
                 currentSavings = 6_000_000.0,
-                annualReturnPercent = 0.0,
+                returnRatePercent = 0.0,
                 timeframeValue = 18,
                 timeframeUnit = TimeframeUnit.MONTHS
             )
@@ -71,7 +72,7 @@ class SavingsGoalCalculatorTest {
             SavingsGoalInput(
                 targetAmount = target,
                 currentSavings = current,
-                annualReturnPercent = rate,
+                returnRatePercent = rate,
                 timeframeValue = years,
                 timeframeUnit = TimeframeUnit.YEARS
             )
@@ -87,7 +88,7 @@ class SavingsGoalCalculatorTest {
             CompoundInterestInput(
                 initialInvestment = current,
                 monthlyContribution = goalResult.requiredMonthlySavings,
-                annualRatePercent = rate,
+                interestRatePercent = rate,
                 years = years,
                 frequency = CompoundingFrequency.MONTHLY
             )
@@ -96,12 +97,39 @@ class SavingsGoalCalculatorTest {
     }
 
     @Test
+    fun monthlyReturnRatePeriod_matchesEquivalentNominalAnnualRate() {
+        val monthlyRateGoal = savingsCalculator.calculate(
+            SavingsGoalInput(
+                targetAmount = 120_000_000.0,
+                currentSavings = 15_000_000.0,
+                returnRatePercent = 0.5,
+                ratePeriod = InterestRatePeriod.MONTHLY,
+                timeframeValue = 5,
+                timeframeUnit = TimeframeUnit.YEARS
+            )
+        )
+        val annualRateGoal = savingsCalculator.calculate(
+            SavingsGoalInput(
+                targetAmount = 120_000_000.0,
+                currentSavings = 15_000_000.0,
+                returnRatePercent = 6.0,
+                ratePeriod = InterestRatePeriod.ANNUALLY,
+                timeframeValue = 5,
+                timeframeUnit = TimeframeUnit.YEARS
+            )
+        )
+
+        assertEquals(annualRateGoal.requiredMonthlySavings, monthlyRateGoal.requiredMonthlySavings, 1e-6)
+        assertEquals(annualRateGoal.totalInterestEarned, monthlyRateGoal.totalInterestEarned, 1e-6)
+    }
+
+    @Test
     fun monthsAndYearsEquivalentTimeframes_matchExactly() {
         val monthsResult = savingsCalculator.calculate(
             SavingsGoalInput(
                 targetAmount = 12_000.0,
                 currentSavings = 2_000.0,
-                annualReturnPercent = 6.0,
+                returnRatePercent = 6.0,
                 timeframeValue = 36,
                 timeframeUnit = TimeframeUnit.MONTHS
             )
@@ -110,7 +138,7 @@ class SavingsGoalCalculatorTest {
             SavingsGoalInput(
                 targetAmount = 12_000.0,
                 currentSavings = 2_000.0,
-                annualReturnPercent = 6.0,
+                returnRatePercent = 6.0,
                 timeframeValue = 3,
                 timeframeUnit = TimeframeUnit.YEARS
             )
@@ -126,7 +154,7 @@ class SavingsGoalCalculatorTest {
             SavingsGoalInput(
                 targetAmount = 10_000.0,
                 currentSavings = 12_000.0,
-                annualReturnPercent = 0.0,
+                returnRatePercent = 0.0,
                 timeframeValue = 12,
                 timeframeUnit = TimeframeUnit.MONTHS
             )
@@ -138,7 +166,7 @@ class SavingsGoalCalculatorTest {
             SavingsGoalInput(
                 targetAmount = 15_000.0,
                 currentSavings = 12_000.0,
-                annualReturnPercent = 12.0,
+                returnRatePercent = 12.0,
                 timeframeValue = 3,
                 timeframeUnit = TimeframeUnit.YEARS
             )
@@ -155,7 +183,8 @@ class SavingsGoalCalculatorTest {
             SavingsGoalInput(
                 targetAmount = Double.NaN,
                 currentSavings = Double.NEGATIVE_INFINITY,
-                annualReturnPercent = Double.POSITIVE_INFINITY,
+                returnRatePercent = Double.POSITIVE_INFINITY,
+                ratePeriod = InterestRatePeriod.MONTHLY,
                 timeframeValue = -10,
                 timeframeUnit = TimeframeUnit.MONTHS
             )

@@ -13,9 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -31,12 +28,14 @@ import androidx.compose.ui.unit.dp
 import com.djatslabs.compoundly.R
 import com.djatslabs.compoundly.domain.formatter.CurrencyFormatter
 import com.djatslabs.compoundly.domain.model.AppCurrency
+import com.djatslabs.compoundly.domain.model.InterestRatePeriod
 import com.djatslabs.compoundly.domain.model.SavingsGoalStatus
 import com.djatslabs.compoundly.domain.model.TimeframeUnit
 import com.djatslabs.compoundly.ui.components.CompoundlyNumericOutlinedField
+import com.djatslabs.compoundly.ui.components.CompoundlySegmentedSelector
 import com.djatslabs.compoundly.ui.components.CurrencyInputField
 import com.djatslabs.compoundly.ui.components.HeroResultCard
-import com.djatslabs.compoundly.ui.components.PercentageInputField
+import com.djatslabs.compoundly.ui.components.RateInputWithPeriodToggle
 import com.djatslabs.compoundly.ui.components.StackedProportionBar
 import com.djatslabs.compoundly.ui.components.SubtleInfoCaption
 import com.djatslabs.compoundly.ui.state.SavingsGoalUiState
@@ -49,7 +48,8 @@ fun SavingsGoalScreen(
     state: SavingsGoalUiState,
     onTargetAmountChanged: (String) -> Unit,
     onCurrentSavingsChanged: (String) -> Unit,
-    onAnnualReturnChanged: (String) -> Unit,
+    onReturnRateChanged: (String) -> Unit,
+    onRatePeriodChanged: (InterestRatePeriod) -> Unit,
     onTimeframeChanged: (String) -> Unit,
     onTimeframeUnitChanged: (TimeframeUnit) -> Unit,
     onViewGuideClick: () -> Unit,
@@ -161,13 +161,18 @@ fun SavingsGoalScreen(
                         modifier = Modifier.testTag("input_current")
                     )
 
-                    PercentageInputField(
-                        value = state.annualReturnInput,
-                        onValueChange = onAnnualReturnChanged,
+                    RateInputWithPeriodToggle(
+                        value = state.returnRateInput,
+                        ratePeriod = state.ratePeriod,
+                        onValueChange = onReturnRateChanged,
+                        onRatePeriodChanged = onRatePeriodChanged,
                         label = stringResource(R.string.savings_input_rate),
-                        placeholder = "0",
-                        imeAction = ImeAction.Next,
-                        modifier = Modifier.testTag("input_savings_rate")
+                        yearlyPlaceholder = "0",
+                        monthlyPlaceholder = "0",
+                        inputTestTag = "input_savings_rate",
+                        yearlyToggleTestTag = "savings_rate_annually",
+                        monthlyToggleTestTag = "savings_rate_monthly",
+                        imeAction = ImeAction.Next
                     )
 
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -189,40 +194,20 @@ fun SavingsGoalScreen(
                             modifier = Modifier.testTag("input_timeframe")
                         )
 
-                        SingleChoiceSegmentedButtonRow(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            val units = TimeframeUnit.entries
-                            units.forEachIndexed { index, unit ->
-                                val selected = state.timeframeUnit == unit
-                                val label = when (unit) {
+                        CompoundlySegmentedSelector(
+                            options = TimeframeUnit.entries,
+                            selectedOption = state.timeframeUnit,
+                            onOptionSelected = onTimeframeUnitChanged,
+                            labelProvider = { unit ->
+                                when (unit) {
                                     TimeframeUnit.MONTHS -> stringResource(R.string.timeframe_months)
                                     TimeframeUnit.YEARS -> stringResource(R.string.timeframe_years)
                                 }
-                                SegmentedButton(
-                                    selected = selected,
-                                    onClick = { onTimeframeUnitChanged(unit) },
-                                    shape = SegmentedButtonDefaults.itemShape(
-                                        index = index,
-                                        count = units.size
-                                    ),
-                                    colors = SegmentedButtonDefaults.colors(
-                                        activeContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                                        activeContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                        inactiveContainerColor = MaterialTheme.colorScheme.surface,
-                                        inactiveContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                    ),
-                                    modifier = Modifier.testTag(
-                                        if (unit == TimeframeUnit.MONTHS) "unit_months" else "unit_years"
-                                    )
-                                ) {
-                                    Text(
-                                        text = label,
-                                        fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium
-                                    )
-                                }
+                            },
+                            testTagProvider = { unit ->
+                                if (unit == TimeframeUnit.MONTHS) "unit_months" else "unit_years"
                             }
-                        }
+                        )
                     }
                 }
             }
