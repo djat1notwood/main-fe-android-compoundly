@@ -1,0 +1,254 @@
+package com.djatslabs.compoundly.ui.screens
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import com.djatslabs.compoundly.R
+import com.djatslabs.compoundly.domain.formatter.CurrencyFormatter
+import com.djatslabs.compoundly.domain.model.AppCurrency
+import com.djatslabs.compoundly.domain.model.SavingsGoalStatus
+import com.djatslabs.compoundly.domain.model.TimeframeUnit
+import com.djatslabs.compoundly.ui.components.CompoundlyNumericOutlinedField
+import com.djatslabs.compoundly.ui.components.CurrencyInputField
+import com.djatslabs.compoundly.ui.components.HeroResultCard
+import com.djatslabs.compoundly.ui.components.PercentageInputField
+import com.djatslabs.compoundly.ui.components.StackedProportionBar
+import com.djatslabs.compoundly.ui.components.SubtleInfoCaption
+import com.djatslabs.compoundly.ui.state.SavingsGoalUiState
+import com.djatslabs.compoundly.ui.theme.CompoundlyTheme
+import java.util.Locale
+
+@Composable
+fun SavingsGoalScreen(
+    currency: AppCurrency,
+    state: SavingsGoalUiState,
+    onTargetAmountChanged: (String) -> Unit,
+    onCurrentSavingsChanged: (String) -> Unit,
+    onAnnualReturnChanged: (String) -> Unit,
+    onTimeframeChanged: (String) -> Unit,
+    onTimeframeUnitChanged: (TimeframeUnit) -> Unit,
+    onViewGuideClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val result = state.result
+    val badgeText = when (result.status) {
+        SavingsGoalStatus.AWAITING_INPUT -> stringResource(R.string.savings_badge_awaiting)
+        SavingsGoalStatus.VALID -> stringResource(R.string.savings_badge_months, result.totalMonths)
+        SavingsGoalStatus.GOAL_ALREADY_REACHED -> stringResource(R.string.savings_badge_reached)
+        SavingsGoalStatus.INVALID_TIMEFRAME -> stringResource(R.string.savings_badge_invalid_time)
+    }
+
+    val helperMessage = when (result.status) {
+        SavingsGoalStatus.AWAITING_INPUT -> stringResource(R.string.savings_note_awaiting)
+        SavingsGoalStatus.GOAL_ALREADY_REACHED -> stringResource(R.string.savings_note_reached)
+        SavingsGoalStatus.INVALID_TIMEFRAME -> stringResource(R.string.savings_note_invalid_time)
+        SavingsGoalStatus.VALID -> null
+    }
+
+    val targetPlaceholder = stringResource(
+        if (currency == AppCurrency.IDR) R.string.hint_amount_idr else R.string.hint_amount_usd_eur
+    )
+    val currentPlaceholder = stringResource(
+        if (currency == AppCurrency.IDR) R.string.hint_monthly_idr else R.string.hint_monthly_usd_eur
+    )
+    val timeframePlaceholder = stringResource(
+        if (state.timeframeUnit == TimeframeUnit.MONTHS) {
+            R.string.hint_timeframe_months
+        } else {
+            R.string.hint_timeframe_years
+        }
+    )
+
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        item(key = "savings_hero") {
+            HeroResultCard(
+                title = stringResource(R.string.savings_hero_title),
+                badgeText = badgeText,
+                heroAmount = CurrencyFormatter.formatCurrency(result.requiredMonthlySavings, currency),
+                heroSuffix = stringResource(R.string.savings_per_month_suffix),
+                helperMessage = helperMessage,
+                primaryMetricLabel = stringResource(R.string.savings_metric_deposits),
+                primaryMetricValue = CurrencyFormatter.formatCurrency(result.totalPersonalPrincipal, currency),
+                secondaryMetricLabel = stringResource(R.string.savings_metric_interest),
+                secondaryMetricValue = CurrencyFormatter.formatCurrency(result.totalInterestEarned, currency),
+                heroValueTestTag = "savings_hero_value"
+            )
+        }
+
+        item(key = "savings_bar") {
+            val depositsLabelFormat = stringResource(R.string.savings_legend_deposits_pct)
+            val interestLabelFormat = stringResource(R.string.savings_legend_interest_pct)
+            StackedProportionBar(
+                principalRatio = result.principalRatio,
+                interestRatio = result.interestRatio,
+                principalLegendWithPct = { pct ->
+                    String.format(Locale.getDefault(), depositsLabelFormat, pct)
+                },
+                interestLegendWithPct = { pct ->
+                    String.format(Locale.getDefault(), interestLabelFormat, pct)
+                },
+                principalLegendZero = stringResource(R.string.savings_legend_deposits),
+                interestLegendZero = stringResource(R.string.savings_legend_interest)
+            )
+        }
+
+        item(key = "savings_inputs") {
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                color = MaterialTheme.colorScheme.surface,
+                border = BorderStroke(1.dp, CompoundlyTheme.financialColors.cardBorder)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.savings_section_inputs),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+
+                    CurrencyInputField(
+                        value = state.targetAmountInput,
+                        onValueChange = onTargetAmountChanged,
+                        label = stringResource(R.string.savings_input_target),
+                        placeholder = targetPlaceholder,
+                        currency = currency,
+                        imeAction = ImeAction.Next,
+                        modifier = Modifier.testTag("input_target")
+                    )
+
+                    CurrencyInputField(
+                        value = state.currentSavingsInput,
+                        onValueChange = onCurrentSavingsChanged,
+                        label = stringResource(R.string.savings_input_current),
+                        placeholder = currentPlaceholder,
+                        currency = currency,
+                        imeAction = ImeAction.Next,
+                        modifier = Modifier.testTag("input_current")
+                    )
+
+                    PercentageInputField(
+                        value = state.annualReturnInput,
+                        onValueChange = onAnnualReturnChanged,
+                        label = stringResource(R.string.savings_input_rate),
+                        placeholder = "0",
+                        imeAction = ImeAction.Next,
+                        modifier = Modifier.testTag("input_savings_rate")
+                    )
+
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        CompoundlyNumericOutlinedField(
+                            value = state.timeframeInput,
+                            onValueChange = onTimeframeChanged,
+                            label = stringResource(R.string.savings_input_timeframe),
+                            placeholder = timeframePlaceholder,
+                            prefixText = null,
+                            suffixText = stringResource(
+                                if (state.timeframeUnit == TimeframeUnit.MONTHS) {
+                                    R.string.timeframe_months
+                                } else {
+                                    R.string.timeframe_years
+                                }
+                            ),
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done,
+                            modifier = Modifier.testTag("input_timeframe")
+                        )
+
+                        SingleChoiceSegmentedButtonRow(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            val units = TimeframeUnit.entries
+                            units.forEachIndexed { index, unit ->
+                                val selected = state.timeframeUnit == unit
+                                val label = when (unit) {
+                                    TimeframeUnit.MONTHS -> stringResource(R.string.timeframe_months)
+                                    TimeframeUnit.YEARS -> stringResource(R.string.timeframe_years)
+                                }
+                                SegmentedButton(
+                                    selected = selected,
+                                    onClick = { onTimeframeUnitChanged(unit) },
+                                    shape = SegmentedButtonDefaults.itemShape(
+                                        index = index,
+                                        count = units.size
+                                    ),
+                                    colors = SegmentedButtonDefaults.colors(
+                                        activeContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                        activeContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        inactiveContainerColor = MaterialTheme.colorScheme.surface,
+                                        inactiveContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                    ),
+                                    modifier = Modifier.testTag(
+                                        if (unit == TimeframeUnit.MONTHS) "unit_months" else "unit_years"
+                                    )
+                                ) {
+                                    Text(
+                                        text = label,
+                                        fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        item(key = "savings_info") {
+            SubtleInfoCaption(
+                text = stringResource(R.string.savings_info_caption)
+            )
+        }
+
+        item(key = "savings_guide_link") {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                TextButton(
+                    onClick = onViewGuideClick,
+                    modifier = Modifier.testTag("view_guide_button")
+                ) {
+                    Text(
+                        text = stringResource(R.string.view_quick_guide),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+        }
+    }
+}
